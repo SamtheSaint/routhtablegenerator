@@ -1,65 +1,97 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Grid,
+  Toolbar,
+  Typography
+} from '@material-ui/core';
+import { useEffect, useRef, useState } from 'react';
+import Matrix from '../components/react-matrix';
+import { generateRouthTable } from '../lib/routh';
 
-export default function Home() {
+function App() {
+  const [routhTable, setRouthTable] = useState(undefined);
+  const [coefficients, setCoefficients] = useState(undefined);
+
+  const inputMatrixRef = useRef(undefined);
+  const outputMatrixRef = useRef(undefined);
+
+  const initialColumns = [['4'], ['3'], ['5'], ['2'], ['1']];
+
+  const handleClick = (e) => {
+    const __columns = inputMatrixRef.current.getColumns();
+    const __coefficients = [];
+    for (const subArray of __columns) {
+      __coefficients.push(Number(subArray[0]));
+    }
+    setCoefficients(__coefficients);
+    const __routhTable = generateRouthTable(__coefficients);
+    console.log('Routh Table: ', __routhTable);
+    setRouthTable(__routhTable);
+  };
+
+  const routhToColumns = (__routhTable) => {
+    const __columns = [];
+    for (let i = 0; i < __routhTable[0].length; i++) {
+      const sub = [];
+      for (let j = 0; j < __routhTable.length; j++) {
+        sub.push(__routhTable[j][i]);
+      }
+      __columns.push(sub);
+    }
+    return __columns;
+  };
+
+  useEffect(() => {
+    if (outputMatrixRef.current) {
+      outputMatrixRef.current.setState({
+        columns: routhToColumns(routhTable)
+      });
+    }
+  }, [routhTable]);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+    <Container maxWidth="md">
+      <AppBar position="static">
+        <Toolbar variant="dense">
+          <Typography variant="h3" color="inherit">
+            Generate Routh Table
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Box style={{ margin: '24px 0' }}>
+        <Typography variant="h4">
+          Enter coefficients of the characteristic polynomial:
+        </Typography>
+        <Grid container>
+          <Matrix
+            columns={initialColumns}
+            resize="horizontal"
+            ref={inputMatrixRef}
+          />
+          <Button onClick={handleClick} style={{ marginLeft: 8 }}>
+            <Typography variant="button">Submit</Typography>
+          </Button>
+        </Grid>
+      </Box>
+      <Box>
+        {routhTable && (
+          <>
+            <Typography variant="h4">
+              Routh Table for coefficients: [{coefficients.join(' ')}]
+            </Typography>
+            <Matrix
+              ref={outputMatrixRef}
+              columns={routhToColumns(routhTable)}
+              readonly={true}
+            />
+          </>
+        )}
+      </Box>
+    </Container>
+  );
 }
+
+export default App;
