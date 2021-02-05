@@ -1,12 +1,13 @@
 import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  Grid,
-  Toolbar,
-  Typography
+	AppBar,
+	Box,
+	Button,
+	Container,
+	Grid,
+	Toolbar,
+	Typography
 } from '@material-ui/core';
+import Head from 'next/head';
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import MathJax from 'react-mathjax';
 import Matrix from '../components/react-matrix';
@@ -61,6 +62,9 @@ function App() {
 
   return (
     <StrictMode>
+      <Head>
+        <title>Routh Table Generator</title>
+      </Head>
       <MathJax.Provider>
         <Container maxWidth="md">
           <AppBar position="static">
