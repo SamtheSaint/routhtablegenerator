@@ -48,7 +48,9 @@ function App() {
 
   const generateEquation = () => {
     const N = coefficients.length;
-    const equation = coefficients.map((v, i) => `${v}s^${N - i}`).join(' + ');
+    const equation = coefficients
+      .map((v, i) => `${v}s^${N - i - 1}`)
+      .join(' + ');
     return equation;
   };
 
